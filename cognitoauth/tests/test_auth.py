@@ -55,14 +55,14 @@ def test_validate_jwt(cognito_settings):
 
     # Ensure it has expired
     d_token = datetime.datetime.utcfromtimestamp(jwt.get_unverified_claims(ACCESS_TOKEN_EXPIRED)["exp"])
-    #assert d_token < datetime.datetime.utcnow()
+    assert d_token < datetime.datetime.utcnow()
 
     # Check it was the expected expiry
     assert d_valid_utc < tz_valid.normalize(tz_valid.localize(d_token)).astimezone(utc)
 
     passed, msg = auth.validate_jwt(ACCESS_TOKEN_EXPIRED, userpool_iss, userpool_keys)
-    #assert passed is False
-    #assert msg == "Failed to decode token: Signature has expired."
+    assert passed is False
+    assert msg == "Failed to decode token: Signature has expired."
 
 
 def test_get_username_from_token():
