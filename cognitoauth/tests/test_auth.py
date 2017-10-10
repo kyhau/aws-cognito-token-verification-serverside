@@ -48,7 +48,7 @@ def test_validate_jwt(cognito_settings):
     ###########################################################################
     # Test case: expired token
     # http://stackoverflow.com/questions/1357711/pytz-utc-conversion#1357711
-    d_valid = datetime.datetime(2017, 10, 9, 10, 26, 07) # 1 hr before expiring
+    d_valid = datetime.datetime(2017, 10, 9, 10, 26, 7) # 1 hr before expiring
     tz_valid = timezone("Australia/Melbourne")
     d_valid_tz = tz_valid.normalize(tz_valid.localize(d_valid))
     d_valid_utc = d_valid_tz.astimezone(utc)
