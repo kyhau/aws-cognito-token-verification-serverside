@@ -27,6 +27,9 @@ pip install -e .
 ## Tox Tests and Build the Wheels
 
 ```
+export COGNITO_REGION=(your_cognito_user_pool_region; e.g. ap-southeast-2)
+export COGNITO_USER_POOL_ID=(your_user_pool_id)
+
 pip install -r requirements-build.txt
 # run the python tests
 tox -r
