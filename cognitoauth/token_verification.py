@@ -6,21 +6,48 @@ import requests
 log = logging.getLogger(__name__)
 
 
-def authorise_request(token, cognito_region, cognito_userpool_id):
+BEARER_PREFIX = "Bearer "
+
+"""
+# Download the JWT Set of the user pool - invariant, and return the JSON Web Keys.
+# Could be run only once
+userpool_iss = cognito_userpool_iss(cognito_region, cognito_userpool_id)
+userpool_keys = cognito_userpool_keys(userpool_iss)
+"""
+
+
+def authorise_request(request, cognito_region, cognito_userpool_id, userpool_keys):
+    """
+    :param token: Cognito token
+    :param cognito_region: string with region for Cognito User Pool
+    :param cognito_userpool_id: string with Cognito User Pool ID
+    :param userpool_keys: JSON Web Keys
+    :return: username
+    """
+    token = retrieve_header_token(request)
+
     username = get_username_from_token(token)
     if username is None:
         raise Exception("Username not found in token")
 
     userpool_iss = cognito_userpool_iss(cognito_region, cognito_userpool_id)
 
-    # TODO could be run only once
-    userpool_keys = cognito_userpool_keys(userpool_iss)
-
     passed, err_msg = validate_jwt(token, userpool_iss, userpool_keys)
     if passed is False:
         raise Exception("Token validation failed: {}".format(err_msg))
 
     return username
+
+
+def retrieve_header_token(request):
+    """Retrieve token from the header of the given request
+    """
+    token = request.headers.get("Authorization", None)
+    if not token:
+        raise Exception("No token found in header")
+    if token.startswith(BEARER_PREFIX):
+        token = token[len(BEARER_PREFIX):]
+    return token
 
 
 def cognito_userpool_iss(cognito_region, cognito_userpool_id):
@@ -69,8 +96,6 @@ def validate_jwt(token, userpool_iss, userpool_keys):
 
     log.debug("Validating token")
 
-    jwk_kids = [obj["kid"] for obj in userpool_keys]
-
     # 2 Decode the token string into JWT format.
     jwt_headers = jwt.get_unverified_header(token)
     kid = jwt_headers["kid"]
@@ -94,10 +119,12 @@ def validate_jwt(token, userpool_iss, userpool_keys):
         return result("Token not of valid use")
 
     # 5 Check kid
+    jwk_kids = [obj["kid"] for obj in userpool_keys]
     if kid not in jwk_kids:
+        # Should be here; condition 2 should have guaranteed this
         return result("Token is not related to id provider")
 
-    # 6 verify signature of decoded JWT?
+    # 6 Verify signature of decoded JWT?
     try:
         jws.verify(token, use_key, jwt_headers["alg"])
     except Exception as e:
