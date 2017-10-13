@@ -43,7 +43,7 @@ def test_authorise_request(cognito_settings):
         auth.authorise_request(mock_request, region, userpool_id, userpool_keys)
 
     ###########################################################################
-    # Test case: invalid token
+    # Test case: valid token
 
     with patch("jose.jwt.get_unverified_header") as mock_header,\
             patch("jose.jwt.get_unverified_claims") as mock_claims,\
