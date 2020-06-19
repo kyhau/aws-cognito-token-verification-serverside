@@ -2,28 +2,27 @@ language: python
 sudo: false
 
 matrix:
-    include:
-    - python: 2.7
-      env: TOXENV=py27
-    - python: 3.4
-      env: TOXENV=py34
-    - python: 3.5
-      env: TOXENV=py35
-    - python: 3.6
-      env: TOXENV=py36,py3-cover,coverage
-    - python: nightly
-      env: TOXENV=py37
-    allow_failures:
-    - env: TOXENV=py37
+  include:
+  - python: 3.7
+    dist: bionic
+    env: TOXENV=py37
+  - python: 3.8
+    dist: bionic
+    env: TOXENV=py38
+  - python: nightly
+    dist: bionic
+    env: TOXENV=py39
+  allow_failures:
+  - env: TOXENV=py39
 
 before_install:
-    - python -m pip install --upgrade setuptools pip virtualenv
+  - python -m pip install --upgrade setuptools pip virtualenv
 
 # command to install dependencies
 install:
-    - pip install -r requirements-build.txt
+  - pip install -r requirements-build.txt
 
 # command to run tests
 script:
-    - tox
-
+  # run pytest, codecov, mypy and flake8 with Tox
+  - tox -r
