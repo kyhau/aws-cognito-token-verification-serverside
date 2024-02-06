@@ -12,7 +12,7 @@ __uri__ = "https://github.com/kyhau/aws-cognito-token-verification-serverside"
 
 __requirements__ = [
     "six>=1.10.0",
-    "pytz==2023.3.post1",
+    "pytz==2024.1",
     "python-jose==3.3.0",
     "requests[security]"
 ]
